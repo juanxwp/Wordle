@@ -1,14 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Casilla from "./components/Casilla.jsx"
+
 const FILAS = 6
 const COLUMNAS = 5
 const SOLUCION = 'PERRO'
-
-function estadoDe(letra, columna) {
-  if (SOLUCION[columna]=== letra) return 'correcta'
-  if (SOLUCION.includes(letra)) return 'presente'
-  return 'ausente'
-}
 
 // Crea un tablero vacío: 6 filas de 5 letras en blanco
 function tableroVacio() {
@@ -19,6 +14,13 @@ function tableroVacio() {
   return tablero
 }
 
+function estadoDe(letra, columna) {
+  if (SOLUCION[columna]=== letra) return 'correcta'
+  if (SOLUCION.includes(letra)) return 'presente'
+  return 'ausente'
+}
+
+
 function App() {
   const [intentos, setIntentos] = useState(tableroVacio())
   const [filaActual, setFilaActual] = useState(0)
@@ -28,6 +30,9 @@ function App() {
   const ganada = ultimo === SOLUCION
   const terminada = ganada || filaActual === FILAS
 
+  useEffect(() => {
+    document.querySelector('.casilla:enabled')?.focus()
+  }, [filaActual])
 
   function cambiarLetra(f, c, evento) {
     const letra = evento.target.value.toUpperCase()
@@ -38,9 +43,9 @@ function App() {
     const copia = intentos.map((fila) => [...fila])
     copia[f][c] = letra
     setIntentos(copia)
+
     // Después de escribir una letra, pasamos a la casilla siguiente
      if (letra !== '') evento.target.nextElementSibling?.focus()
-
   }
 
   function comprobar(evento) {
@@ -48,10 +53,11 @@ function App() {
     evento.preventDefault()
     if (terminada) return
     // No se puede comprobar una fila incompleta
-    if (setIntentos[filaActual].includes('')) return
+    if (intentos[filaActual].includes('')) return
 
     setFilaActual(filaActual + 1)
   }
+  
   return (
     <form className="juego" onSubmit={comprobar}>
       <h1>Wordle</h1>
@@ -87,4 +93,3 @@ function App() {
 
 export default App
 
-//

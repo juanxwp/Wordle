@@ -3,7 +3,7 @@ import Casilla from "./components/Casilla.jsx"
 
 const FILAS = 6
 const COLUMNAS = 5
-const SOLUCION = 'PERRO'
+const SOLUCION = 'GATOS'
 
 // Crea un tablero vacío: 6 filas de 5 letras en blanco
 function tableroVacio() {

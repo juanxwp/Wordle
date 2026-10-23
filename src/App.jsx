@@ -34,6 +34,7 @@ function App() {
   const [intentos, setIntentos] = useState(tableroVacio())
   const [filaActual, setFilaActual] = useState(0)
   const [sol, setSol] = useState(()=>palabraAzar()) 
+  const [aviso, setAviso] = useState('')
 
    // El último intento comprobado, como texto: 'PERRO'
   const ultimo = filaActual > 0 ? intentos[filaActual - 1].join('') : ''
@@ -52,18 +53,28 @@ function App() {
     // Copiamos el tablero, cambiamos la copia y la guardamos
     const copia = intentos.map((fila) => [...fila])
     copia[f][c] = letra
+    setAviso('')
     setIntentos(copia)
 
     // Después de escribir una letra, pasamos a la casilla siguiente
      if (letra !== '') evento.target.nextElementSibling?.focus()
   }
+  function pulsarTecla(evento) {
+    if (evento.key === 'Backspace' && evento.target.value === '') {
+      evento.preventDefault()
+      evento.target.previousElementSibling.focus()
 
+    }
+  }
   function comprobar(evento) {
     // Evita que el navegador recargue la página al enviar el formulario
     evento.preventDefault()
     if (terminada) return
     // No se puede comprobar una fila incompleta
-    if (intentos[filaActual].includes('')) return
+    if (intentos[filaActual].includes('')) {
+      setAviso('Faltan letras')
+      return
+    }
 
     setFilaActual(filaActual + 1);
   }
@@ -86,11 +97,17 @@ function App() {
               estado={f < filaActual ? estadoDe(letra, c, sol) : ''}
               activa={f === filaActual && !terminada}
               onCambio={(evento) =>cambiarLetra(f, c, evento)}
+              onTecla={pulsarTecla}
               />
             ))}
           </div>
         ))}
       </div>
+      {aviso && (
+        <p className="aviso">
+          {aviso}
+        </p>
+      )}
        {terminada ? (
         <>
         <p className="mensaje" role="status">

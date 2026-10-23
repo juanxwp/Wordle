@@ -3,8 +3,17 @@ import Casilla from "./components/Casilla.jsx"
 
 const FILAS = 6
 const COLUMNAS = 5
-const SOLUCION = 'POLOS'
-
+const PALABRAS = [
+  'PERRO', 'GATOS', 'CERDO', 'BOLOS', 'PIANO', 'PLATO'
+]
+function palabraAzar(anterior) {
+  let palabra
+  do{
+    let aleatorio = Math.floor(Math.random()*PALABRAS.length)
+    palabra = PALABRAS[aleatorio]
+  } while(palabra === anterior)
+  return palabra
+}
 // Crea un tablero vacío: 6 filas de 5 letras en blanco
 function tableroVacio() {
   const tablero = []
@@ -14,9 +23,9 @@ function tableroVacio() {
   return tablero
 }
 
-function estadoDe(letra, columna) {
-  if (SOLUCION[columna]=== letra) return 'correcta'
-  if (SOLUCION.includes(letra)) return 'presente'
+function estadoDe(letra, columna, sol) {
+  if (sol[columna]=== letra) return 'correcta'
+  if (sol.includes(letra)) return 'presente'
   return 'ausente'
 }
 
@@ -24,10 +33,11 @@ function estadoDe(letra, columna) {
 function App() {
   const [intentos, setIntentos] = useState(tableroVacio())
   const [filaActual, setFilaActual] = useState(0)
+  const [sol, setSol] = useState(()=>palabraAzar()) 
 
    // El último intento comprobado, como texto: 'PERRO'
   const ultimo = filaActual > 0 ? intentos[filaActual - 1].join('') : ''
-  const ganada = ultimo === SOLUCION
+  const ganada = ultimo === sol
   const terminada = ganada || filaActual === FILAS
 
   useEffect(() => {
@@ -60,6 +70,8 @@ function App() {
   function nuevaPartida(){
     setIntentos(tableroVacio());
     setFilaActual(0);
+    setSol(palabraAzar(sol));
+
   }
   return (
     <form className="juego" onSubmit={comprobar}>
@@ -71,7 +83,7 @@ function App() {
               <Casilla 
               key={c} 
               letra={letra} 
-              estado={f < filaActual ? estadoDe(letra, c) : ''}
+              estado={f < filaActual ? estadoDe(letra, c, sol) : ''}
               activa={f === filaActual && !terminada}
               onCambio={(evento) =>cambiarLetra(f, c, evento)}
               />
@@ -84,7 +96,7 @@ function App() {
         <p className="mensaje" role="status">
           {ganada
             ? '¡Enhorabuena, has acertado!'
-            : `La palabra era ${SOLUCION}`}
+            : `La palabra era ${sol}`}
         </p>
         <button className="boton" type="button" onClick={nuevaPartida}>
           Nueva partida
